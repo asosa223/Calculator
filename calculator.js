@@ -38,14 +38,13 @@ function displayOperand() {
 
     number.forEach(num => {
         num.addEventListener('click', function(){
-            currentOperand.innerText += this.innerText.toString();   
+            if(num.textContent === '.' && currentOperand.textContent.includes('.')) return; 
+            currentOperand.textContent += num.textContent;
         });
-        if(num === '.' && this.currentOperand.innerText.includes('.')) return; //Only display one period
-        
     });
 }
 
-function displayTotal() {
+function updateDisplay() {
 
 }
 
