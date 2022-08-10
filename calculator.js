@@ -49,3 +49,11 @@ function updateDisplay() {
 }
 
 displayOperand();
+
+//When number is pressed, it is shown on display
+//when del is pressed, remove most recent number pressed
+//when operator is pressed, number on display is sent to the top along with operator
+//enter another number and when equals is pressed, number is sent to top and calculation is made
+//calculation should now show on main display
+//calculation number is stored and user can repeat previous steps
+//user can also hit the all clear to reset back to state where no numbers/calculations are stored
