@@ -1,107 +1,127 @@
-function add(a, b) {
-    return a + b;
-}
-
-function subtract(a, b) {
-    return a - b;
-}
-
-function multiply(a, b) {
-    return a * b;
-}
-
-function divide(a, b) {
-    return a / b;
-}
-
-function operate(operator, a, b) {
-    if (operator === '+') {
-        return add(a, b);
-    } else if (operator === '-') {
-        return subtract(a, b);
-    } else if (operator === '*') {
-        return multiply(a, b);
-    } else if (operator === '÷') {
-        return divide(a, b);
-    } else {
-        return alert('ERROR');
+class Calculator {
+    constructor(previousOperandTextElement, currentOperandTextElement) {
+      this.previousOperandTextElement = previousOperandTextElement
+      this.currentOperandTextElement = currentOperandTextElement
+      this.clear()
     }
-}
+  
+    clear() {
+      this.currentOperand = ''
+      this.previousOperand = ''
+      this.operation = undefined
+    }
+  
+    delete() {
+      this.currentOperand = this.currentOperand.toString().slice(0, -1)
+    }
+  
+    appendNumber(number) {
+      if (number === '.' && this.currentOperand.includes('.')) return
+      this.currentOperand = this.currentOperand.toString() + number.toString()
+    }
+  
+    chooseOperation(operation) {
+      if (this.currentOperand === '') return
+      if (this.previousOperand !== '') {
+        this.compute()
+      }
+      this.operation = operation
+      this.previousOperand = this.currentOperand
+      this.currentOperand = ''
+    }
+  
+    compute() {
+      let computation
+      const prev = parseFloat(this.previousOperand)
+      const current = parseFloat(this.currentOperand)
+      if (isNaN(prev) || isNaN(current)) return
+      switch (this.operation) {
+        case '+':
+          computation = prev + current
+          break
+        case '-':
+          computation = prev - current
+          break
+        case '*':
+          computation = prev * current
+          break
+        case '÷':
+          computation = prev / current
+          break
+        default:
+          return
+      }
+      this.currentOperand = computation
+      this.operation = undefined
+      this.previousOperand = ''
+    }
+  
+    getDisplayNumber(number) {
+      const stringNumber = number.toString()
+      const integerDigits = parseFloat(stringNumber.split('.')[0])
+      const decimalDigits = stringNumber.split('.')[1]
+      let integerDisplay
+      if (isNaN(integerDigits)) {
+        integerDisplay = ''
+      } else {
+        integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 })
+      }
+      if (decimalDigits != null) {
+        return `${integerDisplay}.${decimalDigits}`
+      } else {
+        return integerDisplay
+      }
+    }
+  
+    updateDisplay() {
+      this.currentOperandTextElement.innerText =
+        this.getDisplayNumber(this.currentOperand)
+      if (this.operation != null) {
+        this.previousOperandTextElement.innerText =
+          `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`
+      } else {
+        this.previousOperandTextElement.innerText = ''
+      }
+    }
+  }
+  
+  
+  const numberButtons = document.querySelectorAll('#number')
+  const operationButtons = document.querySelectorAll('#operator')
+  const equalsButton = document.querySelector('#equals')
+  const deleteButton = document.querySelector('#delete')
+  const allClearButton = document.querySelector('#all-clear')
+  const previousOperandTextElement = document.querySelector('.previous-operand')
+  const currentOperandTextElement = document.querySelector('.current-operand')
+  
+  const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement)
+  
+  numberButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      calculator.appendNumber(button.innerText)
+      calculator.updateDisplay()
+    })
+  })
+  
+  operationButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      calculator.chooseOperation(button.innerText)
+      calculator.updateDisplay()
+    })
+  })
+  
+  equalsButton.addEventListener('click', button => {
+    calculator.compute()
+    calculator.updateDisplay()
+  })
+  
+  allClearButton.addEventListener('click', button => {
+    calculator.clear()
+    calculator.updateDisplay()
+  })
+  
+  deleteButton.addEventListener('click', button => {
+    calculator.delete()
+    calculator.updateDisplay()
+  })
 
-function displayOperand() {
-    const currentOperand = document.querySelector('.current-operand');
-    const previousOperand = document.querySelector('.previous-operand');
-    const equals = document.querySelector('#equals');
-    const number = document.querySelectorAll('#number');
-    const operator = document.querySelectorAll('#operator');
-    const del = document.querySelector('#delete');
-    const allClear = document.querySelector('#all-clear');
-    let sign = '';
-
-    number.forEach(num => {
-        num.addEventListener('click', () => {
-            if (num.textContent === '.' && currentOperand.textContent.includes('.')) return;
-            currentOperand.textContent += num.textContent;
-        });
-    });
-
-    //When the delete key is pressed, the current operand is sliced by 1
-    del.addEventListener('click', () => {
-        currentOperand.textContent = currentOperand.textContent.slice(0, -1);
-    });
-
-    //When AC is clicked, all inputs are cleared
-    allClear.addEventListener('click', () => {
-        currentOperand.textContent = '';
-        previousOperand.textContent = '';
-    });
-
-
-    operator.forEach(op => {
-        op.addEventListener('click', () => {
-            if (op.textContent === '+') {
-                previousOperand.textContent = `${currentOperand.textContent} +`;
-                sign = '+';
-                currentOperand.textContent = '';
-            } else if (op.textContent === '-') {
-                previousOperand.textContent = `${currentOperand.textContent} -`;
-                sign = '-';
-                currentOperand.textContent = '';
-            } else if (op.textContent === '*') {
-                previousOperand.textContent = `${currentOperand.textContent} *`;
-                sign = '*';
-                currentOperand.textContent = '';
-            } else if (op.textContent === '÷') {
-                previousOperand.textContent = `${currentOperand.textContent} ÷`;
-                sign = '÷';
-                currentOperand.textContent = '';
-            }
-        });
-    });
-
-
-    equals.addEventListener('click', () => {
-        previousOperand.textContent += ` ${currentOperand.textContent}`;
-        currentOperand.textContent = operate(sign, parseFloat(previousOperand.textContent), parseFloat(currentOperand.textContent));
-    });
-
-}
-
-displayOperand();
-
-//When number is pressed, it is shown on display ✅
-//when del is pressed, remove most recent number pressed✅
-//when operator is pressed, number on display is sent to the top along with operator ✅
-//enter another number and when equals is pressed, number is sent to top and calculation is made✅
-//calculation should now show on main display✅
-//calculation number is stored and user can repeat previous steps✅
-//user can also hit the all clear to reset back to state where no numbers/calculations are stored✅
-
-
-//FOR FUTURE ALEC
-//When equals is clicked
-    //number needs to be stored
-    //if a number button is clicked,
-        //clear whats on the display instead of adding it on to the current number
-    //if operator is clicked then number is moved to top of display
-    
